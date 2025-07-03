@@ -9,7 +9,7 @@ if __name__ == "__main__":
     time_length = 300  # 実験時間 (観測時間)
     dt = 0.5  # 時間分解能
     pre = 50  # 前ニューロンの数
-    reservoir_size = 100  # リザバー層のニューロンの数
+    reservoir_size = int(input('number of neuron: '))
     p = 0.05
 
     inputs = np.zeros((pre, int(time_length / dt)))  # 入力スパイク列の初期化
@@ -47,7 +47,9 @@ if __name__ == "__main__":
             )
 
     end = time.time()
-    print(f"processing time was {end - start} sec")
+    print(
+        f"processing time was {end - start} sec when reservoir_size was {reservoir_size}"
+    )
 
 """
     # 結果の描画

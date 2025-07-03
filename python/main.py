@@ -1,6 +1,7 @@
 import time
 
 import numpy as np
+from tqdm import tqdm
 
 # import matplotlib.pyplot as plt
 from LIF import LIF
@@ -40,7 +41,7 @@ if __name__ == "__main__":
 
     start = time.time()
 
-    for t in range(int(time_length / dt)):
+    for t in tqdm(range(int(time_length / dt))):
         for i in range(reservoir_size):
             ResStat[i, t + 1] = neurons[i].calc(
                 inputs[:, t], ResStat[:, t], weights_in, weights_mid[i, :], t

@@ -9,11 +9,12 @@ from LIF import LIF
 if __name__ == "__main__":
     time_length = 300  # 実験時間 (観測時間)
     dt = 0.5  # 時間分解能
+    nt = int(time_length / dt)  # シミュレーションステップ数
     pre = 50  # 前ニューロンの数
     reservoir_size = int(input('number of neuron: '))
     p = 0.05
 
-    inputs = np.zeros((pre, int(time_length / dt)))  # 入力スパイク列の初期化
+    inputs = np.zeros((pre, nt))  # 入力スパイク列の初期化
 
     for i in inputs:
         i[:: np.random.randint(10, 100)] = 1  # 適当にスパイクを等間隔で立ててみる
@@ -31,12 +32,12 @@ if __name__ == "__main__":
 
     # neuron = LIF()
     neurons = [LIF() for _ in range(reservoir_size)]
-    ResStat = np.zeros((reservoir_size, int(time_length / dt) + 1))
+    ResStat = np.zeros((reservoir_size, nt + 1))
     ResStat[:, 0] = np.random.rand(reservoir_size)  # output
 
     start = time.time()
 
-    for t in tqdm(range(int(time_length / dt))):
+    for t in tqdm(range(nt)):
         for i in range(reservoir_size):
             ResStat[i, t + 1] = neurons[i].calc(
                 inputs[:, t], ResStat[:, t], weights_in, weights_mid[i, :], t

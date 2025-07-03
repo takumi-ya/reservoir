@@ -27,12 +27,7 @@ if __name__ == "__main__":
     # middle weight initialize
     weights_mid = np.zeros((reservoir_size, reservoir_size))
     non_zeros = np.random.rand(reservoir_size, reservoir_size)
-    for i in range(reservoir_size):
-        for j in range(reservoir_size):
-            if non_zeros[i][j] > p:
-                weights_mid[i][j] = 0
-            else:
-                weights_mid[i][j] = 0.5  # reservoir weight initialize
+    weights_mid = np.where(non_zeros > p, 0, 0.5)
 
     # neuron = LIF()
     neurons = [LIF() for _ in range(reservoir_size)]

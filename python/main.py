@@ -7,8 +7,8 @@ from tqdm import tqdm
 from LIF import LIF
 
 if __name__ == "__main__":
-    time_length = 300  # 実験時間 (観測時間)
-    dt = 0.5  # 時間分解能
+    time_length = 1000  # 実験時間[ms](比較しやすいように1秒に統一)
+    dt = 0.1  # 時間分解能[ms](同様の理由で統一)
     nt = int(time_length / dt)  # シミュレーションステップ数
     pre = 50  # 前ニューロンの数
     reservoir_size = int(input('number of neuron: '))

@@ -11,6 +11,7 @@ class LIF:
         peak: float = 20,
         i: float = 0,
         tlast: float = 0,
+        size: int = 100,
     ):
         """
         Leaky integrate-and-fire neuron
@@ -20,14 +21,17 @@ class LIF:
         :param tc:   膜時定数 [ms]
         :param peak: ピーク電位 [mV]
         """
-        self.rest = rest
-        self.ref = ref
-        self.th = th
-        self.tc = tc
-        self.peak = peak
-        self.i = i  # 0           # 初期入力電流
-        self.v = rest  # 初期膜電位
-        self.tlast = tlast  # 最後に発火した時刻
+
+        
+        self.size = size
+        self.rest = np.full(size, rest, dtype=np.float32)
+        self.ref = np.full(size, ref, dtype=np.float32)
+        self.th = np.full(size, th, dtype=np.float32)
+        self.tc = np.full(size, tc, dtype=np.float32)
+        self.peak = np.full(size, peak, dtype=np.float32)
+        self.i = np.full(size, i, dtype=np.float32)  # 0           # 初期入力電流
+        self.v = np.full(size, rest, dtype=np.float32)  # 初期膜電位
+        self.tlast = np.full(size, tlast, dtype=np.float32)  # 最後に発火した時刻
 
     def calc(
         self, inputs, ResStat, weights_in, weights_mid, t, time=300, dt=0.5, tci=10
@@ -45,8 +49,9 @@ class LIF:
         # 入力電流の計算
         # di = ((dt * t) > (tlast + self.ref)) * (-i + np.sum(inputs[:, t] * weights))
         di = ((dt * t) > (self.tlast + self.ref)) * (
-            -self.i + np.sum(inputs * weights_in) + np.sum(ResStat * weights_mid)
+            -self.i + np.sum(weights_in * inputs[:,t]) + np.sum(weights_mid * ResStat[:,t])
         )
+        
         self.i += di * dt / tci
 
         # 膜電位の計算

@@ -7,7 +7,7 @@ from tqdm import tqdm
 from LIF import LIF
 
 if __name__ == "__main__":
-    time_length = 1000  # 実験時間[ms](比較しやすいように1秒に統一)
+    time_length = 1  # 実験時間[ms](比較しやすいように1msに統一)
     dt = 0.1  # 時間分解能[ms](同様の理由で統一)
     nt = int(time_length / dt)  # シミュレーションステップ数
     pre = 50  # 前ニューロンの数
@@ -31,21 +31,20 @@ if __name__ == "__main__":
     weights_mid = np.where(non_zeros > p, 0, 0.5)
 
     # neuron = LIF()
-    neurons = [LIF() for _ in range(reservoir_size)]
+    neurons = LIF(size = reservoir_size)
     ResStat = np.zeros((reservoir_size, nt + 1))
     ResStat[:, 0] = np.random.rand(reservoir_size)  # output
 
-    start = time.time()
+    start = time.perf_counter()
 
     for t in tqdm(range(nt)):
-        for i in range(reservoir_size):
-            ResStat[i, t + 1] = neurons[i].calc(
-                inputs[:, t], ResStat[:, t], weights_in, weights_mid[i, :], t
-            )
+        ResStat[:, t + 1] = neurons.calc(
+            inputs, ResStat, weights_in, weights_mid, t
+        )
 
-    end = time.time()
+    end = time.perf_counter()
     print(
-        f"processing time was {end - start} sec when reservoir_size was {reservoir_size}"
+        f"processing time for 1ms simulation was {(end - start)*1000} ms when reservoir_size was {reservoir_size}"
     )
 
 """

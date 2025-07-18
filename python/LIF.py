@@ -1,4 +1,5 @@
 import numpy as np
+import cupy as cp
 
 
 class LIF:
@@ -22,20 +23,21 @@ class LIF:
         :param peak: ピーク電位 [mV]
         """
 
-        
         self.size = size
-        self.rest = np.full(size, rest, dtype=np.float32)
-        self.ref = np.full(size, ref, dtype=np.float32)
-        self.th = np.full(size, th, dtype=np.float32)
-        self.tc = np.full(size, tc, dtype=np.float32)
-        self.peak = np.full(size, peak, dtype=np.float32)
-        self.i = np.full(size, i, dtype=np.float32)  # 0           # 初期入力電流
-        self.v = np.full(size, rest, dtype=np.float32)  # 初期膜電位
-        self.tlast = np.full(size, tlast, dtype=np.float32)  # 最後に発火した時刻
+        self.rest = cp.full(size, rest, dtype=cp.float32)
+        self.ref = cp.full(size, ref, dtype=cp.float32)
+        self.th = cp.full(size, th, dtype=cp.float32)
+        self.tc = cp.full(size, tc, dtype=cp.float32)
+        self.peak = cp.full(size, peak, dtype=cp.float32)
+        self.i = cp.full(size, i, dtype=cp.float32)           # 初期入力電流
+        self.v = cp.full(size, rest, dtype=cp.float32)  # 初期膜電位
+        self.tlast = cp.full(size, tlast, dtype=cp.float32)  # 最後に発火した時刻
 
     def calc(
         self, inputs, ResStat, weights_in, weights_mid, t, time=300, dt=0.5, tci=10
     ):
+        # dt = cp.float32(dt)
+        # tci = cp.float32(tci)
         """
         dtだけ膜電位を計算する
         スパイク1/0のみ出力データとする
@@ -49,7 +51,7 @@ class LIF:
         # 入力電流の計算
         # di = ((dt * t) > (tlast + self.ref)) * (-i + np.sum(inputs[:, t] * weights))
         di = ((dt * t) > (self.tlast + self.ref)) * (
-            -self.i + np.sum(weights_in * inputs[:,t]) + np.sum(weights_mid * ResStat[:,t])
+            -self.i + cp.sum(weights_in * inputs[:,t]) + cp.sum(weights_mid * ResStat[:,t])
         )
         
         self.i += di * dt / tci

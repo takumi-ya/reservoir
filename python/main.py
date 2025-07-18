@@ -1,6 +1,7 @@
 import time
 
 import numpy as np
+import cupy as cp
 from tqdm import tqdm
 
 # import matplotlib.pyplot as plt
@@ -35,12 +36,19 @@ if __name__ == "__main__":
     ResStat = np.zeros((reservoir_size, nt + 1))
     ResStat[:, 0] = np.random.rand(reservoir_size)  # output
 
+    inputs = cp.array(inputs)  # 入力スパイク列をcupy配列に変換
+    ResStat = cp.array(ResStat)  # 出力状態をcupy配列に変換
+    weights_in = cp.array(weights_in)  # 入力重みをcupy配列に変換
+    weights_mid = cp.array(weights_mid)  # 中間重みをcupy配列に変換
+
     start = time.perf_counter()
 
     for t in tqdm(range(nt)):
         ResStat[:, t + 1] = neurons.calc(
             inputs, ResStat, weights_in, weights_mid, t
         )
+
+    ResStat = cp.asnumpy(ResStat)  # 出力状態をnumpy配列に変換
 
     end = time.perf_counter()
     print(
